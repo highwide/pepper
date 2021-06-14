@@ -9,8 +9,9 @@ import { Table, Tr, Tbody, Td } from "@chakra-ui/table";
 import { Text, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 
-import React, { useReducer } from "react";
+import React, { useReducer, useState, useEffect } from "react";
 import EditableCell from "../../components/EditableCell";
+import html2canvas from "html2canvas";
 
 type Naming = {
   callee: string;
@@ -163,10 +164,31 @@ const KoshohyoNewPage = () => {
     });
   };
 
+  const [downloadURL, setDownloadURL] = useState("");
+
+  const generateImageURL = async () => {
+    const tableElement = document.getElementById("koshohyo-table");
+    if (tableElement) {
+      const canvas = await html2canvas(tableElement);
+      setDownloadURL(canvas.toDataURL());
+    } else {
+      return "";
+    }
+  };
+  useEffect(() => {
+    generateImageURL();
+  });
+
   return (
     <Container maxW="container.xl">
       <Text fontSize="4xl">呼称表をつくる</Text>
-      <Table variant="striped" type="whiteAlpha" size="md" overflowX="scroll">
+      <Table
+        id="koshohyo-table"
+        variant="striped"
+        type="whiteAlpha"
+        size="md"
+        overflowX="scroll"
+      >
         <Tbody>
           <Tr>
             <Td w="240px">呼ぶ側 \ 呼ばれる側</Td>
@@ -243,6 +265,9 @@ const KoshohyoNewPage = () => {
           </FormControl>
         </form>
       </Box>
+      <a href={downloadURL} download="koshohyo.png">
+        呼称表画像をダウンロードする
+      </a>
     </Container>
   );
 };
